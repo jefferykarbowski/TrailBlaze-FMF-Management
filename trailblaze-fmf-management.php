@@ -37,6 +37,23 @@ if ( ! defined( 'WPINC' ) ) {
  */
 define( 'TRAILBLAZE_FMF_MANAGEMENT_VERSION', '1.0.0' );
 
+if (!function_exists('write_log')) {
+
+    function write_log($log) {
+        if (true === WP_DEBUG) {
+            if (is_array($log) || is_object($log)) {
+                error_log(print_r($log, true));
+            } else {
+                error_log($log);
+            }
+        }
+    }
+
+}
+
+
+require_once plugin_dir_path( __FILE__ ) . '/vendor/autoload.php';
+
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-trailblaze-fmf-management-activator.php
@@ -58,10 +75,13 @@ function deactivate_trailblaze_fmf_management() {
 register_activation_hook( __FILE__, 'activate_trailblaze_fmf_management' );
 register_deactivation_hook( __FILE__, 'deactivate_trailblaze_fmf_management' );
 
+// require_once plugin_dir_path( __FILE__ ) . 'includes/config.class.php';
+
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
+
 require plugin_dir_path( __FILE__ ) . 'includes/class-trailblaze-fmf-management.php';
 
 /**
@@ -83,7 +103,7 @@ run_trailblaze_fmf_management();
 
 require plugin_dir_path( __FILE__ ) . 'vendors/plugin-update-checker/plugin-update-checker.php';
 $myUpdateChecker = Puc_v4_Factory::buildUpdateChecker(
-    'https://github.com/jefferykarbowski/TrailBlaze-FMF-Managment/',
+    'https://github.com/jefferykarbowski/TrailBlaze-FMF-Management/',
     __FILE__,
     'trailblaze-fmf-management'
 );

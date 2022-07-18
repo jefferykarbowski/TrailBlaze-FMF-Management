@@ -124,6 +124,15 @@ class Trailblaze_Fmf_Management {
 
 		$this->loader = new Trailblaze_Fmf_Management_Loader();
 
+
+        /**
+         * The class responsible for integrating ACF.
+         */
+        if ( !class_exists( 'Trailblaze_Fmf_Management_ACF_Integrate ' ) ) {
+            require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-trailblaze-fmf-management-acf-integrate.php';
+            new Trailblaze_Fmf_Management_ACF_Integrate($this->get_plugin_name(), $this->get_version());
+        }
+
 	}
 
 	/**
@@ -157,6 +166,19 @@ class Trailblaze_Fmf_Management {
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
 
+        $this->loader->add_action( 'acf/init', $plugin_admin, 'acf_add_local_field_groups' );
+
+        // add filter gform_field_value_your_parameter
+        // $this->loader->add_filter( 'user_register', $plugin_admin, 'after_user_registration', 10, 4 );
+
+        // add init action to setup pdf rewrite rules
+        $this->loader->add_action( 'init', $plugin_admin, 'setup_pdf_rewrite_rules' );
+
+        $this->loader->add_filter('query_vars', $plugin_admin, 'add_query_vars');
+
+        // hook up add_admin_menu
+        $this->loader->add_action( 'admin_menu', $plugin_admin, 'add_admin_menu' );
+
 	}
 
 	/**
@@ -172,6 +194,23 @@ class Trailblaze_Fmf_Management {
 
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_styles' );
 		$this->loader->add_action( 'wp_enqueue_scripts', $plugin_public, 'enqueue_scripts' );
+
+
+        // add_filter( 'gform_confirmation', 'custom_confirmation', 10, 4 );
+        $this->loader->add_filter('gform_confirmation', $plugin_public, 'custom_confirmation', 10, 4 );
+
+
+        // add template_include filter to load pdf template
+        $this->loader->add_filter( 'template_include', $plugin_public, 'load_pdf_template', 10, 1 );
+
+        $this->loader->add_filter( 'gform_field_value_raffle_ticket_number', $plugin_public, 'get_raffle_ticket_number' );
+
+        
+        // $this->loader->add_action( 'user_register', $plugin_public, 'after_user_registration', 10, 4 );
+
+        // gform_after_submission
+        $this->loader->add_action( 'gform_after_submission', $plugin_public, 'gform_after_submission', 10, 2 );
+
 
 	}
 
